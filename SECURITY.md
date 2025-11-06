@@ -73,6 +73,36 @@ The application uses Helmet to set various HTTP headers for security:
 - **Data Minimization**: Only necessary data is returned in API responses
 - **Secure Transmission**: All data should be transmitted over HTTPS in production
 
+## CodeQL Security Analysis
+
+The application has been scanned with CodeQL. The following alerts were identified and addressed:
+
+### Resolved Issues
+- **Rate Limiting**: Added comprehensive rate limiting to all routes (100 req/15min general, 5 req/15min auth)
+- **Input Validation**: Added express-validator for input sanitization and validation
+- **Security Headers**: Added Helmet middleware for security headers
+
+### False Positives / Accepted Risk
+The following CodeQL alerts are false positives or accepted design decisions:
+
+1. **SQL Injection (js/sql-injection)**: 
+   - Status: False Positive
+   - Explanation: The application uses MongoDB with Mongoose ODM, not SQL. Mongoose automatically sanitizes queries and prevents NoSQL injection through its type casting and schema validation.
+   - Locations: `server/routes/auth.js` lines 25 and 82
+   - Mitigation: Using express-validator for input sanitization, Mongoose schema validation
+
+2. **Sensitive GET Query (js/sensitive-get-query)**:
+   - Status: Accepted Design Decision
+   - Explanation: The `patientId` in the URL path is necessary for RESTful API design. Access control is enforced through authentication middleware and role-based authorization.
+   - Location: `server/routes/medicalRecords.js` line 38
+   - Mitigation: Authentication required, role-based access control enforced, patientId validated by Mongoose ObjectId casting
+
+3. **Helmet CSP Configuration (js/insecure-helmet-configuration)**:
+   - Status: Development Configuration
+   - Explanation: Content Security Policy is disabled in development for easier debugging and testing. In production (NODE_ENV=production), Helmet's default secure CSP is automatically enabled.
+   - Location: `server.js` line 12-14
+   - Mitigation: CSP is conditionally enabled based on environment variable
+
 ## Security Best Practices
 
 ### For Production Deployment

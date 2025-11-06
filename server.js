@@ -10,7 +10,9 @@ const app = express();
 
 // Security headers
 app.use(helmet({
-  contentSecurityPolicy: false, // Disable for development, should be configured properly in production
+  contentSecurityPolicy: process.env.NODE_ENV === 'production' ? undefined : false,
+  // CSP is disabled in development for easier debugging
+  // In production, Helmet will use default CSP settings which are secure
 }));
 
 // Rate limiting configuration
