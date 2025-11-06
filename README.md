@@ -22,16 +22,18 @@ A comprehensive health web application that connects patients with doctors, enab
 
 ## Technology Stack
 
-- **Backend**: Node.js, Express.js
-- **Database**: MongoDB with Mongoose ODM
+- **Backend**: Java, Spring Boot
+- **Database**: MongoDB with Spring Data MongoDB
 - **Authentication**: JWT (JSON Web Tokens)
 - **Frontend**: HTML5, CSS3, JavaScript (Vanilla)
-- **Security**: bcrypt for password hashing
+- **Security**: Spring Security with BCrypt password hashing
+- **Build Tool**: Maven
 
 ## Installation
 
 ### Prerequisites
-- Node.js (v14 or higher)
+- Java 17 or higher
+- Maven 3.6 or higher
 - MongoDB (v4.4 or higher)
 
 ### Setup Steps
@@ -44,16 +46,15 @@ A comprehensive health web application that connects patients with doctors, enab
 
 2. **Install dependencies**
    ```bash
-   npm install
+   mvn clean install
    ```
 
 3. **Configure environment variables**
-   Create a `.env` file in the root directory:
+   Create a `.env` file in the root directory or update `src/main/resources/application.properties`:
    ```
-   PORT=3000
+   SERVER_PORT=8080
    MONGODB_URI=mongodb://localhost:27017/healthease
-   JWT_SECRET=your-secret-key-change-in-production
-   NODE_ENV=development
+   JWT_SECRET=your-secret-key-change-in-production-minimum-32-characters
    ```
 
 4. **Start MongoDB**
@@ -64,20 +65,21 @@ A comprehensive health web application that connects patients with doctors, enab
 
 5. **Run the application**
    
-   For development (with auto-restart):
+   Using Maven:
    ```bash
-   npm run dev
+   mvn spring-boot:run
    ```
    
-   For production:
+   Or build and run the JAR:
    ```bash
-   npm start
+   mvn package
+   java -jar target/healthease-1.0.0.jar
    ```
 
 6. **Access the application**
    Open your browser and navigate to:
    ```
-   http://localhost:3000
+   http://localhost:8080
    ```
 
 ## API Endpoints
@@ -157,41 +159,75 @@ The application supports three user roles:
 
 ## Security Features
 
-- Password hashing using bcrypt
-- JWT-based authentication
-- Role-based access control
+- Password hashing using BCrypt (Spring Security)
+- JWT-based authentication with token expiration
+- Role-based access control with Spring Security
 - Protected API endpoints
-- Input validation
+- Input validation with Jakarta Validation
+- CORS configuration
+- Method-level security annotations
 
 ## Development
 
 ### Project Structure
 ```
 HealthEase/
-├── server/
-│   ├── config/
-│   │   └── database.js
-│   ├── models/
-│   │   ├── User.js
-│   │   ├── Appointment.js
-│   │   └── MedicalRecord.js
-│   ├── routes/
-│   │   ├── auth.js
-│   │   ├── appointments.js
-│   │   ├── medicalRecords.js
-│   │   └── users.js
-│   └── middleware/
-│       └── auth.js
+├── src/
+│   ├── main/
+│   │   ├── java/com/healthease/
+│   │   │   ├── controller/
+│   │   │   │   ├── AuthController.java
+│   │   │   │   ├── AppointmentController.java
+│   │   │   │   ├── MedicalRecordController.java
+│   │   │   │   └── UserController.java
+│   │   │   ├── model/
+│   │   │   │   ├── User.java
+│   │   │   │   ├── Appointment.java
+│   │   │   │   └── MedicalRecord.java
+│   │   │   ├── repository/
+│   │   │   │   ├── UserRepository.java
+│   │   │   │   ├── AppointmentRepository.java
+│   │   │   │   └── MedicalRecordRepository.java
+│   │   │   ├── service/
+│   │   │   │   ├── UserService.java
+│   │   │   │   ├── AppointmentService.java
+│   │   │   │   └── MedicalRecordService.java
+│   │   │   ├── security/
+│   │   │   │   ├── JwtUtil.java
+│   │   │   │   └── JwtAuthenticationFilter.java
+│   │   │   ├── config/
+│   │   │   │   ├── SecurityConfig.java
+│   │   │   │   └── WebConfig.java
+│   │   │   ├── dto/
+│   │   │   │   ├── RegisterRequest.java
+│   │   │   │   ├── LoginRequest.java
+│   │   │   │   └── AuthResponse.java
+│   │   │   └── HealthEaseApplication.java
+│   │   └── resources/
+│   │       └── application.properties
+│   └── test/
+│       └── java/com/healthease/
 ├── public/
 │   ├── css/
 │   │   └── style.css
 │   ├── js/
 │   │   └── app.js
 │   └── index.html
-├── server.js
-├── package.json
+├── pom.xml
 └── README.md
 ```
+
+### Running Tests
+```bash
+mvn test
+```
+
+### Building for Production
+```bash
+mvn clean package
+```
+
+This creates an executable JAR file in the `target/` directory.
 
 ## Contributing
 
