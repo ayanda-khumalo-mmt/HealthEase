@@ -1,12 +1,24 @@
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
+const { body, validationResult } = require('express-validator');
 const User = require('../models/User');
 const { authenticate } = require('../middleware/auth');
 
 // Register a new user
-router.post('/register', async (req, res) => {
+router.post('/register', [
+  body('email').isEmail().normalizeEmail().trim(),
+  body('password').isLength({ min: 6 }).trim(),
+  body('name').notEmpty().trim().escape(),
+  body('role').optional().isIn(['patient', 'doctor', 'admin'])
+], async (req, res) => {
   try {
+    // Check for validation errors
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ message: 'Validation failed', errors: errors.array() });
+    }
+
     const { email, password, name, role, phone, dateOfBirth, address, specialization, licenseNumber } = req.body;
 
     // Check if user already exists
@@ -53,8 +65,17 @@ router.post('/register', async (req, res) => {
 });
 
 // Login user
-router.post('/login', async (req, res) => {
+router.post('/login', [
+  body('email').isEmail().normalizeEmail().trim(),
+  body('password').notEmpty().trim()
+], async (req, res) => {
   try {
+    // Check for validation errors
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ message: 'Validation failed', errors: errors.array() });
+    }
+
     const { email, password } = req.body;
 
     // Find user
