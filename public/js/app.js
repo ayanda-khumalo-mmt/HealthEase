@@ -488,16 +488,26 @@ async function viewPatientRecords(patientId) {
         const data = await response.json();
         
         if (data.medicalRecords && data.medicalRecords.length > 0) {
-            const recordsHTML = data.medicalRecords.map(record => `
-                <div style="margin-bottom: 1rem; padding: 1rem; background: #f8f9fa; border-radius: 5px;">
-                    <strong>Date:</strong> ${new Date(record.visitDate).toLocaleDateString()}<br>
-                    <strong>Diagnosis:</strong> ${record.diagnosis}<br>
-                    ${record.prescription ? `<strong>Prescription:</strong> ${record.prescription}<br>` : ''}
-                    ${record.notes ? `<strong>Notes:</strong> ${record.notes}<br>` : ''}
+            // Create a modal-like display for medical records
+            const recordsHTML = `
+                <div style="background: white; padding: 2rem; border-radius: 5px; max-width: 600px; margin: 2rem auto;">
+                    <h3>Medical Records</h3>
+                    ${data.medicalRecords.map(record => `
+                        <div style="margin-bottom: 1rem; padding: 1rem; background: #f8f9fa; border-radius: 5px;">
+                            <strong>Date:</strong> ${new Date(record.visitDate).toLocaleDateString()}<br>
+                            <strong>Diagnosis:</strong> ${record.diagnosis}<br>
+                            ${record.prescription ? `<strong>Prescription:</strong> ${record.prescription}<br>` : ''}
+                            ${record.notes ? `<strong>Notes:</strong> ${record.notes}<br>` : ''}
+                        </div>
+                    `).join('')}
                 </div>
-            `).join('');
+            `;
             
-            alert('Medical Records:\n\n' + recordsHTML);
+            // Create a simple modal overlay
+            const modal = document.createElement('div');
+            modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; overflow-y: auto;';
+            modal.innerHTML = recordsHTML + '<div style="text-align: center; padding: 1rem;"><button class="btn btn-secondary" onclick="this.parentElement.parentElement.remove()">Close</button></div>';
+            document.body.appendChild(modal);
         } else {
             alert('No medical records found for this patient');
         }

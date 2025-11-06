@@ -93,10 +93,12 @@ async function startTestServer() {
     const mongod = await setupTestDB();
     await seedData();
     
-    // Update the database URI for the server
-    process.env.MONGODB_URI = 'mongodb://localhost:27017/healthease'; // This will be overridden by mongoose connection
+    // Set environment variables for the server
     process.env.JWT_SECRET = 'test-secret-key';
     process.env.PORT = 3000;
+    
+    // Note: The in-memory MongoDB connection is already established
+    // The server will use the existing mongoose connection
     
     // Start the Express server
     require('./server.js');
